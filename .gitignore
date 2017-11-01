@@ -1,6 +1,6 @@
 # my rules
 data/
-configPyCurlApi.py
+#configPyCurlApi.py
 *.sh
 *.pyproj
 *.sln
