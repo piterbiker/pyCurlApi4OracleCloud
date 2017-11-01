@@ -4,29 +4,25 @@ import pickle
 authToken = ''
 
 class PikleToken():
-    "Klasa grupujaca funkcje peklowania danych"
-    
-    def __init__(self, kat, plik, slownik=None):
-        "konstruktor danych wejsciowych"
+    '''
+    Class for grouping pickle method
+    '''
         
+    def __init__(self, kat, plik):
         self.kat = kat
         self.plik = plik
-        self.slownik = slownik      
 
     def pickleZapis(self, slownik):
-        """
-        Funkcja zapisujaca plik z danymi w formacie pkl.
-        Podajemy jako parametry katalog z danymi, nazwe pliku oraz
-        krotke danych wejsciowych
-        """
+        '''
+        Save authToken to file as a pickle data
+        '''
         pikelZap = open((os.path.join(self.kat, 'data', self.plik)), 'wb')
         pickle.dump(slownik, pikelZap)
         pikelZap.close()
     
     def pickleOdczyt(self):
         """
-        Funkcja zwaracajaca odczytana liste enumeracji z pliku w formacie pkl.
-        Podajemy jako parametry katalog z danymi, nazwe pliku
+        Read authToken from file (pickle data)
         """
         pikel = open((os.path.join(self.kat, 'data', self.plik)), 'rb')
         dane=pickle.load(pikel)
@@ -34,10 +30,8 @@ class PikleToken():
         return dane
 
 
-# tworzenie instancji klasy Peklowanie
 tokenObject = PikleToken(kat = os.getcwd(), plik = 'pikle')
 
-# wywolanie funkcji zapisu do pliku z parametrem wejsciowym INPUTSTRING
 if __name__ == '__main__':
     tokenObject = PikleToken(kat = os.getcwd(), plik = 'pikle')
     tokenObject.pickleZapis(authToken)

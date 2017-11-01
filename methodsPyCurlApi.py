@@ -13,220 +13,277 @@ from configPyCurlApi import (
     storageUser, storagePass, 
     XauthToken, userStorageAuth, userStorageService, userStorageCont, 
     # other
-    db, services, curlPath, DEBUG
+    user, db, services, curlPath, DEBUG
     )
 
-# attributes array for Application Container
-appContArray = [
-    curlPath,
-    '-i',
-    '-X',
-    'GET',
-    '-u',
-    creditString,
-    '-H',
-    '"{}"'.format(appContHeader), 
-    userServices
-]
 
-# attributes array for Storage Classic
-storageClAuthArray = [
-    curlPath,
-    '-v',
-    '-X',
-    'GET',
-    '-H',
-    storageUser,
-    '-H',
-    storagePass, 
-    userStorageAuth
-]
+class CommonContainer(object):
+    '''
+    Common class for Application Container & Storage Classic objects 
+    '''
+    def getDefault(self, curlStr, curlArray):
+        curlStrFinal = curlStr.format(*curlArray)
+        if DEBUG:
+            print (curlStrFinal)
+        with open('output.sh', 'w') as textFile:
+            textFile.write(curlStrFinal)
 
-storageClInfoArray = [
-    curlPath,
-    '-v',
-    '-X',
-    'GET',
-    '-H',
-    XauthToken,
-    userStorageService
-]
+        p = subprocess.Popen(
+            curlArray,
+            stdout=sys.stdout
+            )
 
 
-# -------------------------------------------------------------------------------------------
-# REST API for Managing Applications methods
-def getDefault(endString=None):
-    curlStr = r"""
+class AppContainer(CommonContainer):
+    '''
+    REST API Methods for managing applications in Application container 
+    '''
+    def __init__(self):
+        # templates for cURL commands
+        self.curlStr = r"""
 {} {} {} {} {} {} \
   {} {} \
-  {}""".format(*appContArray)
+  {}"""
 
-    if DEBUG:
-        print (curlStr)
-    with open('output.sh', "w") as textFile:
-        textFile.write(curlStr + '\n')
+        self.curlStrCreate = r"""
+{} {} {} {} {}\
+  {} {} \
+  {} {} \
+  {} {} {} {} {} {} \
+  {} {} {} {} \
+  {} {} \
+  {} {} {} {} \
+  {}"""
 
-    p = subprocess.Popen(
-        appContArray,
-        stdout=sys.stdout
-        )
+        self.curlStrUpdate = r"""
+{} {} {} {} {}\
+  {} {} \
+  {} {} \
+  {} {} {} {} \
+  {} {} {} {} \
+  {}"""
 
-def getViewAllApplications():
-    '''
-    Retrieves all applications in the identity domain.
-    '''
-    getDefault()
-
-
-def getViewApplicationDetails(appName):
-    '''
-    Returns detailed information about an application.
-    '''
-    appContArray[8] = '{}/{}'.format(userServices, appName)
-    getDefault()
-
-
-def getViewAllApplicationsDetails():
-    '''
-    Returns detailed information about an application: for all application.
-    '''
-    for service in services:
-        getViewApplicationDetails(service)
-
-
-def postStartApplication(appName):
-    '''
-    Starts an application
-    '''
-    appContArray[3] = 'POST'
-    appContArray[8] = '{}/{}/start'.format(userServices, appName)
-    getDefault()
-
-
-def postStopApplication(appName):
-    '''
-    Stop an application
-    '''
-    appContArray[3] = 'POST'
-    appContArray[8] = '{}/{}/stop'.format(userServices, appName)
-    getDefault()
-
-
-def postCreateApplication(appName, notes, archiveURL, runtime):
-    '''
-    Create an Application
-    '''
-    global appContArray
-    appContArray[3] = 'POST'
-    appContArray[8] = '-H'
-
-    appContArrayCreate = [
-        '"Content-Type: multipart/form-data"', 
-        '-F', 
-        '"name={}"'.format(appName), 
-        '-F', 
-        '"runtime={}"'.format(runtime), 
-        '-F', 
-        '"subscription=Monthly"', 
-        '-F', 
-        '"manifest=@manifest.json"', 
-        '-F', 
-        '"deployment=@deployment.json"', 
-        '-F', 
-        '"archiveURL={}"'.format(archiveURL), 
-        '-F', 
-        '"notes={}"'.format(notes), 
+        # attributes array for Application Container's cURL commands
+        self.appContArray = [
+        curlPath,
+        '-i',
+        '-X',
+        'GET',
+        '-u',
+        creditString,
+        '-H',
+        '"{}"'.format(appContHeader), 
         userServices
     ]
 
-    appContArray += appContArrayCreate
-    print(*appContArray, sep = '\n')
-    getDefault()
+
+    def getViewAllApplications(self):
+        '''
+        Retrieves all applications in the identity domain.
+        '''
+        self.getDefault(self.curlStr, self.appContArray)
 
 
+    def getViewApplicationDetails(self, appName):
+        '''
+        Returns detailed information about an application.
+        '''
+        self.appContArray[8] = '{}/{}'.format(userServices, appName)
+        self.getDefault(self.curlStr, self.appContArray)
 
+
+    def getViewAllApplicationsDetails(self):
+        '''
+        Returns detailed information about an application: for all application.
+        '''
+        for service in services:
+            self.getViewApplicationDetails(service)
+
+
+    def postStartApplication(self, appName):
+        '''
+        Starts an application
+        '''
+        self.appContArray[3] = 'POST'
+        self.appContArray[8] = '{}/{}/start'.format(userServices, appName)
+        self.getDefault(self.curlStr, self.appContArray)
+
+
+    def postStopApplication(self, appName):
+        '''
+        Stop an application
+        '''
+        self.appContArray[3] = 'POST'
+        self.appContArray[8] = '{}/{}/stop'.format(userServices, appName)
+        self.getDefault(self.curlStr, self.appContArray)
+
+
+    def postCreateApplication(self, appName, runtime, archiveURL, notes):
+        '''
+        Create an Application
+        '''
+        self.appContArray[3] = 'POST'
+        self.appContArray[8] = '-H'
+
+        appContArrayCreate = [
+            '"Content-Type: multipart/form-data"', 
+            '-F', 
+            '"name={}"'.format(appName), 
+            '-F', 
+            '"runtime={}"'.format(runtime), 
+            '-F', 
+            '"subscription=Monthly"', 
+            '-F', 
+            '"manifest=@manifest.json"', 
+            '-F', 
+            '"deployment=@deployment.json"', 
+            '-F', 
+            '"archiveURL={}"'.format(archiveURL), 
+            '-F',             
+            '"notificationEmail={}"'.format(user), 
+            '-F', 
+            '"notes={}"'.format(notes), 
+            userServices
+        ]
+
+        self.appContArray += appContArrayCreate
+        self.appContArray.pop(1)
+        self.getDefault(self.curlStrCreate, self.appContArray)
+
+
+    def postDeleteApplication(self, appName):
+        '''
+        Deletes an application. Returns details about the application being deleted.
+        '''
+        self.appContArray[3] = 'DELETE'
+        self.appContArray[8] = '{}/{}'.format(userServices, appName)
+        self.getDefault(self.curlStr, self.appContArray)
+
+
+    def putUpdatesApplication(self, appName, archiveURL, notes):
+        '''
+        Updates an Oracle Application Container Cloud Service Application
+        '''
+        self.appContArray[3] = 'PUT'
+        self.appContArray[8] = '-H'
+    
+        appContArrayUpdate = [
+            '"Content-Type: multipart/form-data"', 
+            '-F', 
+            '"manifest=@manifest.json"', 
+            '-F', 
+            '"deployment=@deployment.json"', 
+            '-F', 
+            '"archiveURL={}"'.format(archiveURL), 
+            '-F', 
+            '"notes={}"'.format(notes), 
+            '{}/{}'.format(userServices, appName)
+        ]
+
+        self.appContArray += appContArrayUpdate
+        self.appContArray.pop(1)
+        self.getDefault(self.curlStrUpdate, self.appContArray)
 
 # -------------------------------------------------------------------------------------------
-# REST API for Standard Storage in Oracle Cloud 
-# Infrastructure Object Storage Classic
-def getDefaultStorage(arrayCloud):
-    p = subprocess.Popen(
-        arrayCloud,
-        stdout=sys.stdout
-        )
+
+class StorageClassic(CommonContainer):
+    '''
+    REST API Methods for managing obects in Storage Classic 
+    '''
+    def __init__(self):
+        # templates for cURL commands
+        self.curlStr = r"""
+{} {} {} {} \
+  {} {} \
+  {} {} \
+  {}"""
+
+        self.curlStrInfo = r"""
+{} {} {} {} \
+  {} {} \
+  {}"""
+
+        #attributes array for Storage's Classic cURL commands
+        self.storageClInfoArray = [
+            curlPath,
+            '-v',
+            '-X',
+            'GET',
+            '-H',
+            XauthToken,
+            userStorageService
+        ]
 
     
-def getRequestAuthenticationToken():
-    '''
-    Requesting an authentication token.
-    '''
-    getDefaultStorage(storageClAuthArray)
+    def getRequestAuthenticationToken(self):
+        '''
+        Requesting an authentication token.
+        '''
+        storageClAuthArray = [
+            curlPath,
+            '-v',
+            '-X',
+            'GET',
+            '-H',
+            storageUser,
+            '-H',
+            storagePass, 
+            userStorageAuth
+        ]
+
+        self.getDefault(self.curlStr, storageClAuthArray)
 
 
-def getShowAccountDetails():
-    '''
-    Show account details and list containers.
-    '''
-    getDefaultStorage(storageClInfoArray)
+    def getShowAccountDetails(self):
+        '''
+        Show account details and list containers.
+        '''
+        self.getDefault(self.curlStrInfo, self.storageClInfoArray)
 
 
-def getShowAccountDetails():
-    '''
-    Show account details and list containers.
-    '''
-    getDefaultStorage(storageClInfoArray)
+    def getShowContainerDetails(self):
+        '''
+        Show container details and list objects.
+        '''
+        self.storageClInfoArray[6] = userStorageCont
+        self.getDefault(self.curlStrInfo, self.storageClInfoArray)
 
 
-def getShowContainerDetails():
-    '''
-    Show container details and list objects,
-    '''
-    storageClInfoArray[6] = userStorageCont
-    getDefaultStorage(storageClInfoArray)
+    def getGetObjectContent(self, localFile, remoteFile):
+        '''
+        Get object content and metadata.
+        '''
+        self.storageClInfoArray[6] = '-o'
+        self.storageClInfoArray.append(os.path.join('data', localFile))
+        self.storageClInfoArray.append('{}/{}'.format(userStorageCont, remoteFile))
+        self.getDefault(self.curlStr, self.storageClInfoArray)
 
 
-def getGetObjectContent(localFile, remoteFile):
-    '''
-    Get object content and metadata.
-    '''
-    storageClInfoArray[6] = '-o'
-    storageClInfoArray.append(os.path.join('data', localFile))
-    storageClInfoArray.append('{}/{}'.format(userStorageCont, remoteFile))
-    getDefaultStorage(storageClInfoArray)
-
-
-def putCreateReplaceObject(localFile, remoteFile):
-    '''
-    Create or replace object.
-    '''
-    storageClInfoArray[3] = 'PUT'
-    storageClInfoArray[6] = '-T'
-    storageClInfoArray.append(os.path.join('data', localFile))
-    storageClInfoArray.append('{}/{}'.format(userStorageCont, remoteFile))
-    getDefaultStorage(storageClInfoArray)
+    def putCreateReplaceObject(self, localFile, remoteFile):
+        '''
+        Create or replace object.
+        '''
+        self.storageClInfoArray[3] = 'PUT'
+        self.storageClInfoArray[6] = '-T'
+        self.storageClInfoArray.append(os.path.join('data', localFile))
+        self.storageClInfoArray.append('{}/{}'.format(userStorageCont, remoteFile))
+        self.getDefault(self.curlStr, self.storageClInfoArray)
 
 # -------------------------------------------------------------------------------------------
 # TODO: Python requests as cURL
 
-#headers = {
-#    appContHeader
-#}
+#def getViewAllApplicationsReq():
 
-#r = requests.get(
-#    adres,
-#    headers=headers,
-#    auth=(user, haslo)
-#    )
+#    r = requests.get(
+#        userServices,
+#        headers={
+#            appContHeader
+#        }, 
+#        auth=(user, password)
+#        )
 
-#nagl = r.headers
-#data = r.json()
+#    responseHeader = r.headers
+#    responseData = r.json()
 
-#pprint.pprint(dict(nagl), width=1)
-#print (80*'-'+'\n')
-#pprint.pprint(data, width=1)
-#print ('\n')
-
-
-
-
-
+#    pprint.pprint(dict(nagl), width=1)
+#    pprint.pprint(data, width=1)

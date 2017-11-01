@@ -1,24 +1,18 @@
 from methodsPyCurlApi import (
     # Application Container
-    # GET
-    getViewAllApplications, getViewApplicationDetails, getViewAllApplicationsDetails, 
-    # POST
-    postStartApplication, postStopApplication, postCreateApplication, 
+    AppContainer, 
 
     # Storage Classic
-    # GET
-    getRequestAuthenticationToken, 
-    getShowAccountDetails, getShowContainerDetails, 
-    getGetObjectContent, putCreateReplaceObject
+    StorageClassic
     )
+
 
 def main():
     '''
-    enter necessary methods here
+    Enter necessary methods here
     '''
-    
-    getViewAllApplications()
-
+    appContainerObject = AppContainer()
+    appContainerObject.getViewAllApplications()
     input()
 
 
