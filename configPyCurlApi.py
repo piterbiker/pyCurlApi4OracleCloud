@@ -14,7 +14,7 @@ userEndpoint = ''
 CURL_DIR = r''
 
 # compound data
-appContHeader = 'X-ID-TENANT-NAME: {}'.format(identityDomainId)
+appContHeader = 'X-ID-TENANT-NAME:{}'.format(identityDomainId)
 curlPath = os.path.join(CURL_DIR, 'curl.exe')
 creditString = '{}:{}'.format(user, password)
 storageSrv = 'Storage-{}'.format(identityDomainId)
@@ -43,7 +43,7 @@ userServices = '{}/service/apaas/api/v1.1/apps/{}'.format(userEndpoint, identity
 userStorage = 'https://{}.storage.oraclecloud.com'.format(identityDomainId)
 userStorageAuth = '{}/auth/v1.0'.format(userStorage)
 userStorageService = '{}/v1/{}'.format(userStorage, storageSrv)
-userStorageCont = '{}/{}'.format(userStorageService, containers[1])
+userStorageCont = '{}/{}'.format(userStorageService, containers[0])
 
 
 # -------------------------------------------------------------------------------------------
