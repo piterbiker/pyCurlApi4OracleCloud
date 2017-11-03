@@ -37,13 +37,15 @@ containers = [
 
     ]
 
+container = containers[0]
+
 # -------------------------------------------------------------------------------------------
 # account links: Application Container
 userServices = '{}/service/apaas/api/v1.1/apps/{}'.format(userEndpoint, identityDomainId)
 userStorage = 'https://{}.storage.oraclecloud.com'.format(identityDomainId)
 userStorageAuth = '{}/auth/v1.0'.format(userStorage)
 userStorageService = '{}/v1/{}'.format(userStorage, storageSrv)
-userStorageCont = '{}/{}'.format(userStorageService, containers[0])
+userStorageCont = '{}/{}'.format(userStorageService, container)
 
 
 # -------------------------------------------------------------------------------------------
