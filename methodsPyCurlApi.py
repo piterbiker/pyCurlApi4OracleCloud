@@ -13,7 +13,7 @@ from configPyCurlApi import (
     storageUser, storagePass, 
     XauthToken, userStorageAuth, userStorageService, userStorageCont, 
     # other
-    user, db, services, curlPath, DEBUG
+    user, db, services, container, curlPath, DEBUG
     )
 
 
@@ -22,7 +22,7 @@ class CommonContainer(object):
     Common class for Application Container & Storage Classic objects 
     '''
     def getDefault(self, curlStr, curlArray):
-        curlStrFinal = curlStr.format(*curlArray)
+        curlStrFinal = (curlStr.format(*curlArray)).replace(curlPath, 'curl')
         if DEBUG:
             print (curlStrFinal)
         with open('output.sh', 'w') as textFile:
@@ -46,7 +46,7 @@ class AppContainer(CommonContainer):
   {}"""
 
         self.curlStrCreate = r"""
-{} {} {} {} {}\
+{} {} {} {} {} \
   {} {} \
   {} {} \
   {} {} {} {} {} {} \
@@ -56,7 +56,7 @@ class AppContainer(CommonContainer):
   {}"""
 
         self.curlStrUpdate = r"""
-{} {} {} {} {}\
+{} {} {} {} {} \
   {} {} \
   {} {} \
   {} {} {} {} \
@@ -134,9 +134,9 @@ class AppContainer(CommonContainer):
             '-F', 
             '"subscription=Monthly"', 
             '-F', 
-            '"manifest=@manifest.json"', 
+            '"manifest={}/manifest.json"'.format(container), 
             '-F', 
-            '"deployment=@deployment.json"', 
+            '"deployment={}/deployment.json"'.format(container), 
             '-F', 
             '"archiveURL={}"'.format(archiveURL), 
             '-F',             
