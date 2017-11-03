@@ -40,25 +40,18 @@ class AppContainer(CommonContainer):
     '''
     def __init__(self):
         # templates for cURL commands
-        self.curlStr = r"""
-{} {} {} {} {} {} \
+        self.curlStr = r"""{} {} {} {} {} {} \
   {} {} \
   {}"""
 
-        self.curlStrCreate = r"""
-{} {} {} {} {} \
-  {} {} \
-  {} {} \
+        self.curlStrCreate = self.curlStr + r""" {} \
   {} {} {} {} {} {} \
   {} {} {} {} \
   {} {} \
   {} {} {} {} \
   {}"""
 
-        self.curlStrUpdate = r"""
-{} {} {} {} {} \
-  {} {} \
-  {} {} \
+        self.curlStrUpdate = self.curlStr + r""" {} \
   {} {} {} {} \
   {} {} {} {} \
   {}"""
@@ -69,8 +62,8 @@ class AppContainer(CommonContainer):
         '-i',
         '-X',
         'GET',
-        '-u',
-        creditString,
+        '--user',
+        creditString, 
         '-H',
         '"{}"'.format(appContHeader), 
         userServices
@@ -134,9 +127,9 @@ class AppContainer(CommonContainer):
             '-F', 
             '"subscription=Monthly"', 
             '-F', 
-            '"manifest={}/manifest.json"'.format(container), 
+            '"manifest=@manifest.json"',    # '"manifest={}/manifest.json"'.format(container), 
             '-F', 
-            '"deployment={}/deployment.json"'.format(container), 
+            '"deployment=@deployment.json"', 
             '-F', 
             '"archiveURL={}"'.format(archiveURL), 
             '-F',             
@@ -147,7 +140,6 @@ class AppContainer(CommonContainer):
         ]
 
         self.appContArray += appContArrayCreate
-        self.appContArray.pop(1)
         self.getDefault(self.curlStrCreate, self.appContArray)
 
 
@@ -181,7 +173,6 @@ class AppContainer(CommonContainer):
         ]
 
         self.appContArray += appContArrayUpdate
-        self.appContArray.pop(1)
         self.getDefault(self.curlStrUpdate, self.appContArray)
 
 # -------------------------------------------------------------------------------------------
@@ -192,15 +183,11 @@ class StorageClassic(CommonContainer):
     '''
     def __init__(self):
         # templates for cURL commands
-        self.curlStr = r"""
-{} {} {} {} \
-  {} {} \
+        self.curlStrInfo = r"""{} {} {} {} \
   {} {} \
   {}"""
 
-        self.curlStrInfo = r"""
-{} {} {} {} \
-  {} {} \
+        self.curlStr = self.curlStrInfo + r""" {} \
   {}"""
 
         #attributes array for Storage's Classic cURL commands
