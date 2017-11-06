@@ -236,12 +236,12 @@ class StorageClassic(CommonContainer):
         self.getDefault(self.curlStrInfo, self.storageClInfoArray)
 
 
-    def getGetObjectContent(self, localFile, remoteFile):
+    def getGetObjectContent(self, remoteFile):
         '''
         Get object content and metadata.
         '''
         self.storageClInfoArray[6] = '-o'
-        self.storageClInfoArray.append(os.path.join('data', localFile))
+        self.storageClInfoArray.append(os.path.join('data', remoteFile.replace('/', '_')))
         self.storageClInfoArray.append('{}/{}'.format(userStorageCont, remoteFile))
         self.getDefault(self.curlStr, self.storageClInfoArray)
 
@@ -256,21 +256,3 @@ class StorageClassic(CommonContainer):
         self.storageClInfoArray.append('{}/{}'.format(userStorageCont, remoteFile))
         self.getDefault(self.curlStr, self.storageClInfoArray)
 
-# -------------------------------------------------------------------------------------------
-# TODO: Python requests as cURL
-
-#def getViewAllApplicationsReq():
-
-#    r = requests.get(
-#        userServices,
-#        headers={
-#            appContHeader
-#        }, 
-#        auth=(user, password)
-#        )
-
-#    responseHeader = r.headers
-#    responseData = r.json()
-
-#    pprint.pprint(dict(nagl), width=1)
-#    pprint.pprint(data, width=1)
